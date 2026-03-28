@@ -271,6 +271,17 @@ if ! venv_pip "git+${WHISPERJAV_REPO}@${WHISPERJAV_BRANCH}#egg=whisperjav[cli,en
     exit 1
 fi
 
+# Patch Silero VAD to work in non-interactive environments (Colab/Kaggle)
+# torch.hub prompts for trust confirmation via input() which fails with EOFError
+SILERO_BACKEND="$VENV_PATH/lib/python${PYTHON_MAJOR}.${PYTHON_MINOR}/site-packages/whisperjav/modules/speech_segmentation/backends/silero.py"
+if [[ -f "$SILERO_BACKEND" ]]; then
+    sed -i 's/force_reload=not is_cached,/force_reload=False,/' "$SILERO_BACKEND"
+    sed -i 's/onnx=False$/onnx=False,\n                trust_repo=True/' "$SILERO_BACKEND"
+    success "Silero VAD patched for non-interactive use"
+else
+    warn "Could not find silero.py to patch (path: $SILERO_BACKEND)"
+fi
+
 # Verify WhisperJAV installation
 info "Verifying WhisperJAV installation..."
 

@@ -208,7 +208,7 @@ class SileroSpeechSegmenter:
             self._model, self._utils = torch.hub.load(
                 repo_or_dir=self.repo,
                 model="silero_vad",
-                force_reload=not is_cached,
+                force_reload=False,
                 onnx=False,
                 trust_repo = True
             )
