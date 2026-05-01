@@ -22,7 +22,7 @@
 # ==============================================================================
 
 # Configuration
-WHISPERJAV_REPO="https://github.com/meizhong986/WhisperJAV.git"
+WHISPERJAV_REPO="https://github.com/geoffrey-kk/Whisper.git"
 WHISPERJAV_BRANCH="main"
 HF_WHEEL_REPO="mei986/whisperjav-wheels"
 LLAMA_CPP_VERSION="0.3.21"
