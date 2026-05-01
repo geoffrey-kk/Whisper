@@ -114,8 +114,12 @@ class BSRoformerSpeechEnhancer:
             # Try initializing with the selected device
             try:
                 self._separator = BSRoformer(device=device)
+            except TypeError:
+                # Older bs-roformer-infer versions don't accept 'device' in __init__
+                self._separator = BSRoformer()
+                import torch
+                self._separator.to(torch.device(device))
             except Exception as dev_err:
-                # If MPS failed (model may not support all ops), fall back to CPU
                 if device == "mps":
                     logger.info(
                         f"BS-RoFormer does not support MPS ({dev_err}), "
