@@ -93,42 +93,21 @@ class BSRoformerSpeechEnhancer:
         logger.debug(f"BSRoformerSpeechEnhancer configured: model={self._model_name}")
 
     def _ensure_initialized(self) -> bool:
-        """
-        Lazy initialization of BS-RoFormer model.
-
-        Returns:
-            True if initialized successfully, False otherwise
-        """
         if self._initialized:
             return True
 
         try:
-            # Import bs-roformer
-            from bs_roformer import BSRoformer
+            from bs_roformer import Separator
 
-            logger.info(f"Loading BS-RoFormer model for stem: {self._model_name}")
-
-            # Resolve best available device (cuda > mps > cpu)
             device = resolve_torch_device(self._device)
+            logger.info(f"Loading BS-RoFormer ({self._model_name}) on {device}")
 
-            # Try initializing with the selected device
             try:
-                self._separator = BSRoformer(device=device)
+                self._separator = Separator(device=device)
             except TypeError:
-                # Older bs-roformer-infer versions don't accept 'device' in __init__
-                self._separator = BSRoformer()
                 import torch
+                self._separator = Separator()
                 self._separator.to(torch.device(device))
-            except Exception as dev_err:
-                if device == "mps":
-                    logger.info(
-                        f"BS-RoFormer does not support MPS ({dev_err}), "
-                        "falling back to CPU"
-                    )
-                    device = "cpu"
-                    self._separator = BSRoformer(device=device)
-                else:
-                    raise
 
             self._initialized = True
             logger.info(f"BS-RoFormer loaded successfully on {device}")
